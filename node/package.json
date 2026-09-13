@@ -1,0 +1,42 @@
+{
+  "name": "@kalourmade/arkesel-sms",
+  "version": "0.1.0",
+  "description": "Node/TypeScript SDK for the Arkesel SMS/OTP gateway",
+  "license": "MIT",
+  "homepage": "https://github.com/kalourmade/arkesel-sdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kalourmade/arkesel-sdk.git",
+    "directory": "node"
+  },
+  "bugs": {
+    "url": "https://github.com/kalourmade/arkesel-sdk/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "tsup": "^8.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.4.0"
+  }
+}
