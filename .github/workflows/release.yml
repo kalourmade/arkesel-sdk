@@ -1,0 +1,110 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+  php-release:
+    needs: version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+      - run: composer validate
+      - run: composer install
+      - run: composer exec phpunit
+      # Packagist has no separate publish step: it reads composer.json
+      # from the repo root and versions packages from git tags directly,
+      # so this job is a release gate (tests must pass) plus a GitHub Release.
+
+  python-publish:
+    needs: version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      - name: Set version from tag
+        run: sed -i "s/^version = .*/version = \"${{ needs.version.outputs.version }}\"/" python/pyproject.toml
+      - run: pip install -e "python[dev]"
+      - run: pytest python/tests
+      - run: pip install build twine
+      - run: python -m build python
+      - run: twine upload python/dist/*
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+
+  node-publish:
+    needs: version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm install
+        working-directory: node
+      - name: Set version from tag
+        run: npm version ${{ needs.version.outputs.version }} --no-git-tag-version --allow-same-version
+        working-directory: node
+      - run: npm run typecheck
+        working-directory: node
+      - run: npm test
+        working-directory: node
+      - run: npm run build
+        working-directory: node
+      - run: npm publish --access public
+        working-directory: node
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  node-github-packages:
+    needs: [version, node-publish]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@kalourmade'
+      - run: npm install
+        working-directory: node
+      - run: npm version ${{ needs.version.outputs.version }} --no-git-tag-version --allow-same-version
+        working-directory: node
+      - run: npm run build
+        working-directory: node
+      - run: npm publish
+        working-directory: node
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  github-release:
+    needs: [version, php-release, python-publish, node-publish]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
