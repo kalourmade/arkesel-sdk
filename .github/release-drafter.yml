@@ -1,0 +1,55 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+
+categories:
+  - title: '🚀 Features'
+    labels:
+      - 'feature'
+      - 'enhancement'
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'fix'
+      - 'bugfix'
+      - 'bug'
+  - title: '📚 Documentation'
+    labels:
+      - 'docs'
+      - 'documentation'
+  - title: '🧰 Maintenance'
+    labels:
+      - 'chore'
+      - 'ci'
+      - 'refactor'
+
+change-template: '- $TITLE (@$AUTHOR)'
+change-title-escapes: '\<*_&'
+
+version-resolver:
+  major:
+    labels:
+      - 'major'
+      - 'breaking'
+  minor:
+    labels:
+      - 'minor'
+      - 'feature'
+      - 'enhancement'
+  patch:
+    labels:
+      - 'patch'
+      - 'fix'
+      - 'bugfix'
+      - 'bug'
+      - 'chore'
+      - 'docs'
+  default: patch
+
+exclude-labels:
+  - 'skip-changelog'
+
+template: |
+  ## Changes
+
+  $CHANGES
+
+  All three packages (`kalourmade/arkesel-sms` on Packagist, `kalourmade-arkesel` on PyPI, `@kalourmade/arkesel-sms` on npm) release together at this version.
