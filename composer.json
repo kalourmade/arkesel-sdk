@@ -1,0 +1,27 @@
+{
+  "name": "kalourmade/arkesel-sms",
+  "description": "PHP SDK for the Arkesel SMS/OTP gateway",
+  "type": "library",
+  "license": "MIT",
+  "homepage": "https://github.com/kalourmade/arkesel-sdk",
+  "support": {
+    "issues": "https://github.com/kalourmade/arkesel-sdk/issues",
+    "source": "https://github.com/kalourmade/arkesel-sdk"
+  },
+  "require": {
+    "php": ">=8.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Kalourmade\\Arkesel\\": "php/src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Kalourmade\\Arkesel\\Tests\\": "php/tests/"
+    }
+  }
+}
