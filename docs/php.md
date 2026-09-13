@@ -12,16 +12,29 @@ Requires PHP 8.1+. No runtime dependencies.
 
 ## Quickstart
 
+Two things this SDK does: send SMS messages, and generate/verify OTPs.
+Both are first-class resources on the same client.
+
 ```php
 use Kalourmade\Arkesel\ArkeselClient;
 
 $client = new ArkeselClient(getenv('ARKESEL_API_KEY'));
 
+// Send a message
 $response = $client->sms->send('Arkesel', ['233544919953'], 'Hello from Arkesel');
 
 foreach ($response->results as $result) {
     echo "{$result->recipient} -> {$result->id}\n";
 }
+
+// Generate and verify an OTP
+$otp = $client->otp->generate(
+    expiry: 5, length: 6, medium: 'sms',
+    message: 'Your code is %otp_code%',
+    number: '233544919953', senderId: 'Arkesel', type: 'numeric'
+);
+
+$client->otp->verify(code: $userEnteredCode, number: '233544919953');
 ```
 
 Full runnable examples: [`examples/php/send.php`](../examples/php/send.php),

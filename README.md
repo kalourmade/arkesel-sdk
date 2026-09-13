@@ -24,7 +24,12 @@ only, Node: none) and read your API key from the environment —
 
 ## Quickstart
 
-Send an SMS to one or more recipients in a single call:
+This is one SDK, two jobs: **send SMS messages**, and **generate/verify
+OTPs**. Both are first-class — a `client.sms` resource and a
+`client.otp` resource on the exact same client, not a messaging SDK
+with OTP bolted on.
+
+### Sending a message
 
 **PHP**
 ```php
@@ -63,6 +68,44 @@ const response = await client.sms.send({
   recipients: ['233544919953'],
   message: 'Hello from Arkesel',
 });
+```
+
+### Generating and verifying an OTP
+
+**PHP**
+```php
+$otp = $client->otp->generate(
+    expiry: 5, length: 6, medium: 'sms',
+    message: 'Your code is %otp_code%',
+    number: '233544919953', senderId: 'Arkesel', type: 'numeric'
+);
+
+// ...later, once the user enters the code they received:
+$client->otp->verify(code: $userEnteredCode, number: '233544919953');
+```
+
+**Python**
+```python
+client.otp.generate(
+    expiry=5, length=6, medium="sms",
+    message="Your code is %otp_code%",
+    number="233544919953", sender_id="Arkesel", type="numeric",
+)
+
+# ...later, once the user enters the code they received:
+client.otp.verify(code=user_entered_code, number="233544919953")
+```
+
+**Node**
+```typescript
+await client.otp.generate({
+  expiry: 5, length: 6, medium: 'sms',
+  message: 'Your code is %otp_code%',
+  number: '233544919953', senderId: 'Arkesel', type: 'numeric',
+});
+
+// ...later, once the user enters the code they received:
+await client.otp.verify({ code: userEnteredCode, number: '233544919953' });
 ```
 
 ## What each SDK covers
